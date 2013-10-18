@@ -1,0 +1,36 @@
+<?php
+/**
+ * @file
+ */
+
+/**
+ * Implements hook_permission()
+ */
+function at_doc_permission() {
+  $items['at-doc access'] = array(
+    'title' => 'Acccess Website Documentation',
+    'description' => '',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_menu()
+ */
+function at_doc_menu() {
+  $items['admin/report/documentation'] = array(
+    'title' => 'Site Documentation',
+    'access arguments' => array('at-doc access'),
+    'page callback' => '\Drupal\at_doc\Controller\Report::pageCallback',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_go_api()
+ */
+function at_doc_go_api() {
+  return array('api' => '1.0');
+}
