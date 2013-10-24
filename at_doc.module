@@ -27,10 +27,3 @@ function at_doc_menu() {
 
   return $items;
 }
-
-/**
- * Implements hook_go_api()
- */
-function at_doc_go_api() {
-  return array('api' => '1.0');
-}

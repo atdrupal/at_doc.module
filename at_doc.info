@@ -5,4 +5,5 @@ description = Module for Drupal to generate documentation about the Drupal setup
 core = 7.x
 
 ; Require for lazy loading
-dependencies[] = go
+dependencies[] = at_base
+dependencies[] = at_autoload
