@@ -38,8 +38,12 @@ class NodeTypes extends BaseReport {
     $fields = $permissions = $p_header = array();
 
     foreach (field_info_instances('node', $machine_name) as $fn => $fi) {
-      $label = "<strong>{$fi['label']}</strong>". (!empty($fi['required']) ? '<span class="form-required">*</span>' : '')  ." ({$fn})";
-      $fields[] = array($label, $fi['widget']['type']);
+      $label = l($fi['label'], "admin/structure/types/manage/". str_replace('_', '-', $machine_name) ."/fields/{$fn}");
+      $fields[] = array(
+        $label = $label . (!empty($fi['required']) ? '<span class="form-required">*</span>' : '')  ." ({$fn})",
+        $fi['widget']['type'],
+        !empty($fi['description']) ? $fi['description'] : ($this->iconError() . ' <em>Missing</em>'),
+      );
     }
 
     $p_header[] = t('Role');
@@ -54,7 +58,7 @@ class NodeTypes extends BaseReport {
     }
 
     $fields = theme('table', array(
-      'header' => array('Field', 'Widget'),
+      'header' => array('Field', 'Widget', 'Description'),
       'rows' => $fields
     ));
 
@@ -65,9 +69,14 @@ class NodeTypes extends BaseReport {
 
     return array(
       $node_type->module,
-      "<strong>{$bundle['label']}</strong><br />($node_type->type)",
+      "<strong>{$bundle['label']}</strong> ($node_type->type)"
+        . _filter_autop(
+            (empty($node_type->description)
+                ? $this->iconError() . '<em>Missing description</em>'
+                : strip_tags($node_type->description))
+          ),
       $fields,
-      _filter_autop(strip_tags($node_type->description)) . $permissions,
+      $permissions,
     );
   }
 }
