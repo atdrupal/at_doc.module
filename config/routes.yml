@@ -1,5 +1,6 @@
 routes:
   'admin/reports/documentation':
     title: Site Documentation
+    description: Quick report for site setup
     access arguments: ['at-doc access']
     controller: ['Drupal\at_doc\Controller\Report', 'render']
