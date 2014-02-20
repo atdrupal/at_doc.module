@@ -6,4 +6,3 @@ core = 7.x
 
 ; Require for lazy loading
 dependencies[] = at_base
-dependencies[] = at_autoload
