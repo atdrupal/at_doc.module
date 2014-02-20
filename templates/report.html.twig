@@ -1,0 +1,16 @@
+
+<div class="at-doc-reports" data-version="{{ context_translation.id }}">
+  <ul>
+    {% for id, item in reports %}
+      <li><a href="#report-{{ id }}">{{ id }}</a></li>
+    {% endfor %}
+  </ul>
+
+  {% for id, item in reports %}
+    <div id="report-{{ id }}">
+      {{ item|render }}
+    </div>
+  {% endfor %}
+</div>
+
+<style>table td { vertical-align: top !important; }</style>
