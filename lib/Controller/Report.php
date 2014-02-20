@@ -12,10 +12,7 @@ class Report {
 
       foreach ($reports as $i => $report) {
         $report = new $report();
-        $output['reports'][$i] = array(
-          '#prefix' => "<h3><a name='doc-{$i}' href='#doc-{$i}'>{$report->name}</a></h3>",
-          $report->render()
-        );
+        $output['reports'][$i] = $report->render();
       }
 
       return array(

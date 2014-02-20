@@ -28,7 +28,7 @@ class Views extends BaseReport {
         $c1,
         $c2 . (empty($links) ? '' : theme('item_list', array('items' => $links, 'title' => t('Paths')))),
         $c3,
-        implode(', ', $displays)
+        !empty($displays) ? implode(', ', $displays) : '<em>No display</em>'
       );
     }
 
