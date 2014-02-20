@@ -16,6 +16,10 @@ abstract class BaseReport {
     return '<img src="/misc/message-16-ok.png" />';
   }
 
+  protected function iconInfo() {
+    return '<img src="/misc/message-16-info.png" />';
+  }
+
   protected function iconError() {
     return '<img src="/misc/message-16-error.png" />';
   }

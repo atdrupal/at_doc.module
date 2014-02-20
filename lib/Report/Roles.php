@@ -19,7 +19,7 @@ class Roles extends BaseReport {
         );
       }
 
-      $rows[] = array('x', user_role_load($role_id)->name, $permissions);
+      $rows[] = array($this->iconInfo(), user_role_load($role_id)->name, $permissions);
     }
 
     return array(

@@ -21,7 +21,7 @@ class InputFormats extends BaseReport {
       }
 
       $rows[] = array(
-        'x',
+        $this->iconInfo(),
         "<strong>{$format->name}</strong> ({$format->format})",
         $roles_markup,
         $format->weight
