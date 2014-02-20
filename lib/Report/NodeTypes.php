@@ -9,7 +9,9 @@ class NodeTypes extends BaseReport {
     $u = new \stdClass();
     $u->uid = 1000 + $role_id;
     $u->roles = array($role_id => $role_name);
-    return user_access($perm, $u) ? $this->iconOk : 'No';
+    return user_access($perm, $u) || user_access('bypass node access', $u)
+      ? $this->iconOk()
+      : 'No';
   }
 
   public function process() {
