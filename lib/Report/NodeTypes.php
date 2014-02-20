@@ -69,7 +69,7 @@ class NodeTypes extends BaseReport {
 
     return array(
       $node_type->module,
-      "<strong>{$bundle['label']}</strong> ($node_type->type)"
+      l($bundle['label'], 'admin/structure/types/manage/' . str_replace('_', '-', $node_type->type)) ." ($node_type->type)"
         . _filter_autop(
             (empty($node_type->description)
                 ? $this->iconError() . '<em>Missing description</em>'
