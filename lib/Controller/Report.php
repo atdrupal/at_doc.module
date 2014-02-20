@@ -2,11 +2,11 @@
 namespace Drupal\at_doc\Controller;
 
 class Report {
-    public function pageCallback() {
-      $reports[] = 'Drupal\at_doc\Report\Roles';
-      $reports[] = 'Drupal\at_doc\Report\NodeTypes';
-      $reports[] = 'Drupal\at_doc\Report\InputFormats';
-      $reports[] = 'Drupal\at_doc\Report\Views';
+    public function render() {
+      $reports['Roles'] = 'Drupal\at_doc\Report\Roles';
+      $reports['NodeTypes'] = 'Drupal\at_doc\Report\NodeTypes';
+      $reports['InputFormats'] = 'Drupal\at_doc\Report\InputFormats';
+      $reports['Views'] = 'Drupal\at_doc\Report\Views';
       foreach ($reports as $i => $report) {
         $report = new $report();
         $output[] = array(

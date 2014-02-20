@@ -2,4 +2,4 @@ routes:
   'admin/report/documentation':
     title: Site Documentation
     access arguments: ['at-doc access']
-    controller: ['Drupal\at_doc\Controller\Report', 'pageCallback']
+    controller: ['Drupal\at_doc\Controller\Report', 'render']
