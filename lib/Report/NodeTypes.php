@@ -9,12 +9,12 @@ class NodeTypes extends BaseReport {
     $u = new \stdClass();
     $u->uid = 1000 + $role_id;
     $u->roles = array($role_id => $role_name);
-    return user_access($perm, $u) ? t('Yes') : t('No');
+    return user_access($perm, $u) ? $this->iconOk : 'No';
   }
 
   public function process() {
     return array(
-      'header' => array('Feature', 'Content Type', 'Bundle', 'Fields'),
+      'header' => array('Feature', 'Content Type', 'Fields', 'Permissions'),
       'rows' => $this->getRows(),
       'widths' => array(10, 40, 30, 80),
     );
@@ -51,20 +51,21 @@ class NodeTypes extends BaseReport {
       }
     }
 
-    $fields = theme(
-      'table',
-      array('header' => array('Field', 'Widget'),
+    $fields = theme('table', array(
+      'header' => array('Field', 'Widget'),
       'rows' => $fields
     ));
 
-
-    $permissions = theme('table', array('header' => $p_header, 'rows' => $permissions, 'caption' => t('Permissions')));
+    $permissions = theme('table', array(
+      'header' => $p_header,
+      'rows' => $permissions,
+    ));
 
     return array(
       $node_type->module,
       "<strong>{$bundle['label']}</strong><br />($node_type->type)",
-      _filter_autop(strip_tags($node_type->description)) . $permissions,
       $fields,
+      _filter_autop(strip_tags($node_type->description)) . $permissions,
     );
   }
 }

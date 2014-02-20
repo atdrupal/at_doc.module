@@ -11,4 +11,12 @@ abstract class BaseReport {
       '#rows' => $results['rows']
     );
   }
+
+  protected function iconOk() {
+    return '<img src="/misc/message-16-ok.png" />';
+  }
+
+  protected function iconError() {
+    return '<img src="/misc/message-16-error.png" />';
+  }
 }
