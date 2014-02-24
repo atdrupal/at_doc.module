@@ -40,7 +40,7 @@ class NodeTypes extends BaseReport {
     foreach (field_info_instances('node', $machine_name) as $fn => $fi) {
       $label = l($fi['label'], "admin/structure/types/manage/". str_replace('_', '-', $machine_name) ."/fields/{$fn}");
       $fields[] = array(
-        $label = $label . (!empty($fi['required']) ? '<span class="form-required">*</span>' : '')  ." ({$fn})",
+        $label . (!empty($fi['required']) ? '<span class="form-required">*</span>' : '')  ." ({$fn})",
         $fi['widget']['type'],
         !empty($fi['description']) ? $fi['description'] : ($this->iconError() . ' <em>Missing</em>'),
       );

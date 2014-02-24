@@ -2,14 +2,22 @@
 namespace Drupal\at_doc\Report;
 
 abstract class BaseReport {
+  protected function process() {
+      throw new \Exception('Please implement process method.');
+  }
+
   public function render() {
     $results = $this->process();
 
-    return array(
-      '#theme' => 'table',
-      '#header' => $results['header'],
-      '#rows' => $results['rows']
-    );
+    if (!empty($results['rows'])) {
+        return array(
+          '#theme' => 'table',
+          '#header' => $results['header'],
+          '#rows' => $results['rows']
+        );
+    }
+
+    return $results;
   }
 
   protected function iconOk() {

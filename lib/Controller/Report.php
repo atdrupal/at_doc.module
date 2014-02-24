@@ -24,5 +24,7 @@ class Report {
           'library' => array(array('system', 'ui.tabs', FALSE)),
         ),
       );
+    public function renderReport($class) {
+        return render(at_id(new $class)->render());
     }
 }
