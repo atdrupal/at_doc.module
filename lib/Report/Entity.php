@@ -27,7 +27,7 @@ class Entity extends BaseReport
               '#title' => $info['label'],
               '#description' => theme('item_list', array('items' => array(
                 "<strong>Machine name:</strong> {$entity_type}",
-                "<strong>View modes</strong>: " . implode(', ', $view_modes)
+                "<strong>View modes</strong>: " . (!empty($view_modes) ? implode(', ', $view_modes) : '<em>No view mode</em>')
               ))),
               '#value' => render($this->processEntityType($entity_type, $info)),
               '#collapsible' => TRUE,
@@ -84,9 +84,9 @@ class Entity extends BaseReport
         $rows = array();
         foreach (field_info_instances($entity_type, $bundle) as $field_name => $field_info) {
             $rows[] = array(
-              $field_info['label'] . (!empty($field_info['required']) ? '<span class="form-required">*</span>' : '') . " ({$field_name})",
+              "<strong>{$field_info['label']}</strong>" . (!empty($field_info['required']) ? '<span class="form-required">*</span>' : '') . " ({$field_name})",
               $field_info['widget']['type'],
-              !empty($field_info['description']) ? $field_info['description'] : ($this->iconError() . ' <em>Missing</em>'),
+              !empty($field_info['description']) ? $field_info['description'] : ($this->iconError() . '<em>Missing</em>'),
             );
         }
 
