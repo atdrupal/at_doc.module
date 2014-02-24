@@ -1,16 +1,38 @@
+{{ reports|fn__dsma }}
 
-<div class="at-doc-reports" data-version="{{ context_translation.id }}">
+<div class="at-doc-reports">
   <ul>
     {% for id, item in reports %}
       <li><a href="#report-{{ id }}">{{ id }}</a></li>
     {% endfor %}
   </ul>
 
-  {% for id, item in reports %}
-    <div id="report-{{ id }}">
-      {{ item|render }}
-    </div>
+  {% for id, item in reports %}    
+    {% if id == 'Entity' %}
+        <div class="at-doc-reports-entity">
+            <ul>
+                {% for item in reports[id] %}
+                    <li><a href="#at-report-entity-{{ item.entity_type }}"">{{ item.label }}</a></li>
+                {% endfor %}
+            </ul>
+
+            {% for item in reports[id] %}
+                <div id="at-report-entity-{{ item.entity_type }}">{{ item.content }}</div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div id="report-{{ id }}">
+        {{ item|render }}
+        </div>
+    {% endif %}
   {% endfor %}
 </div>
 
-<style>table td { vertical-align: top !important; }</style>
+<style>
+  .ui-tabs-vertical { width: 55em; }
+  .ui-tabs-vertical .ui-tabs-nav { padding: .2em .1em .2em .2em; float: left; width: 12em; }
+  .ui-tabs-vertical .ui-tabs-nav li { clear: left; width: 100%; border-bottom-width: 1px !important; border-right-width: 0 !important; margin: 0 -1px .2em 0; }
+  .ui-tabs-vertical .ui-tabs-nav li a { display:block; }
+  .ui-tabs-vertical .ui-tabs-nav li.ui-tabs-active { padding-bottom: 0; padding-right: .1em; border-right-width: 1px; border-right-width: 1px; }
+  .ui-tabs-vertical .ui-tabs-panel { padding: 1em; float: right; width: 40em;}
+</style>

@@ -3,9 +3,10 @@ namespace Drupal\at_doc\Controller;
 
 class Report {
     public function render() {
+      // $reports['Entity'] = 'Drupal\at_doc\Report\Entity';
       $reports['Roles'] = 'Drupal\at_doc\Report\Roles';
-      $reports['NodeTypes'] = 'Drupal\at_doc\Report\NodeTypes';
       $reports['InputFormats'] = 'Drupal\at_doc\Report\InputFormats';
+      $reports['NodeTypes'] = 'Drupal\at_doc\Report\NodeTypes';
       $reports['Views'] = 'Drupal\at_doc\Report\Views';
 
       $output = array('reports' => array());
@@ -15,7 +16,7 @@ class Report {
         $output['reports'][$i] = $report->render();
       }
 
-      return array(
+      $return = array(
         '#markup' => at_container('twig')->render('@at_doc/templates/report.html.twig', $output),
         '#attached' => array(
           'js' => array(
@@ -24,6 +25,10 @@ class Report {
           'library' => array(array('system', 'ui.tabs', FALSE)),
         ),
       );
+
+      return render($return);
+    }
+
     public function renderReport($class) {
         return render(at_id(new $class)->render());
     }
