@@ -45,7 +45,7 @@ class Entity extends BaseReport
         if (!empty($entity_info['bundles'])) {
             foreach ($entity_info['bundles'] as $bundle => $bundle_info) {
                 $rows[] = array_merge(
-                  array(isset($entity_info['module']) ? $entity_info['module'] : $this->iconInfo() . ' <em>unknown</em>'),
+                  array($this->findBundleFeature($entity_type, $entity_info, $bundle)),
                   $this->processBundle($entity_type, $bundle, $bundle_info)
                 );
             }
@@ -92,6 +92,7 @@ class Entity extends BaseReport
         $rows = array();
         foreach (field_info_instances($entity_type, $bundle) as $field_name => $field_info) {
             $rows[] = array(
+              $this->findFieldFeature($entity_type, $bundle, $field_name),
               "{$field_info['label']}" . (!empty($field_info['required']) ? '<span class="form-required">*</span>' : '') . " ({$field_name})",
               $field_info['widget']['type'],
               !empty($field_info['description']) ? $field_info['description'] : ($this->iconError() . '<em> Missing</em>'),
@@ -102,6 +103,7 @@ class Entity extends BaseReport
             return array(
               '#theme' => 'table',
               '#header' => array(
+                array('data' => t('Feature'), 'width' => '120'),
                 'Field',
                 array('data' => t('Widget'),      'width' => '150'),
                 array('data' => t('Description'), 'width' => '200')
@@ -133,6 +135,7 @@ class Entity extends BaseReport
         foreach ($fields as $machine_name => $field) {
             // Create node from field.
             $node = array(
+              'feature' => $this->findFieldFeature($entity_type, $bundle, $machine_name),
               // Field's name doesn't have strong tag.
               'name' => "{$field['label']}" . (!empty($field['required']) ? '<span class="form-required">*</span>' : '') . " ({$machine_name})",
               'widget_type' => $field['widget']['type'],
@@ -149,6 +152,7 @@ class Entity extends BaseReport
         foreach ($groups as $machine_name => $group) {
             // Create node from group.
             $node = array(
+              'feature' => $this->findGroupFeature($group->identifier),
               // Group's name have strong tag, field doesn't have that tag.
               'name' => "<strong>{$group->label}</strong> ({$machine_name})",
               'widget_type' => $group->format_type,
@@ -177,6 +181,7 @@ class Entity extends BaseReport
             }
 
             $rows[] = array(
+              $node['feature'],
               $indentation . $node['name'],
               $node['widget_type'],
               $node['description'],
@@ -187,6 +192,7 @@ class Entity extends BaseReport
             return array(
               '#theme' => 'table',
               '#header' => array(
+                array('data' => t('Feature'), 'width' => '120'),
                 'Field',
                 array('data' => t('Widget'),      'width' => '150'),
                 array('data' => t('Description'), 'width' => '200')
@@ -298,6 +304,62 @@ class Entity extends BaseReport
         }
 
         return $results;
+    }
+
+    private function findBundleFeature($entity_type, $entity_info, $bundle) {
+
+        // Support eck module.
+        if (module_exists('eck') && isset($entity_info['module']) && $entity_info['module'] == 'eck') {
+            // This entity type is created by eck.
+            $map = features_get_component_map('eck_bundle');
+            $bundle_machine_name = $entity_type . '_' . $bundle;
+
+            return $this->findFeature($map, $bundle_machine_name);
+        }
+        else {
+            // Support all bundles in taxonomy_term.
+            if ($entity_type == 'taxonomy_term') {
+                $map = features_get_component_map('taxonomy');
+
+                return $this->findFeature($map, $bundle);
+            }
+
+            // Other entity type, include node.
+            $map = features_get_component_map($entity_type);
+
+            return $this->findFeature($map, $bundle);
+        }
+    }
+
+    private function findFieldFeature($entity_type, $bundle, $field_name) {
+        $map = features_get_component_map('field_instance');
+        $field_feature_component = $entity_type . '-' . $bundle . '-' . $field_name;
+
+        return $this->findFeature($map, $field_feature_component);
+    }
+
+    private function findGroupFeature($identifier) {
+        $map = features_get_component_map('field_group');
+
+        return $this->findFeature($map, $identifier);
+    }
+
+    private function findFeature($features_map, $component) {
+
+        if (isset($features_map[$component])) {
+            if (count($features_map[$component]) > 1) {
+                // Conflict.
+                return $this->iconError() . ' <em>conflict</em>' .
+                  theme('item_list', array('items' => $features_map[$component]));
+            }
+            else {
+                $feature = reset($features_map[$component]);
+                return $feature;
+            }
+        }
+        else {
+            return $this->iconInfo() . ' <em>unknown</em>';
+        }
     }
 
 }
