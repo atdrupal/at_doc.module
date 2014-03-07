@@ -1,7 +1,7 @@
 name = AT Doc
 version = 7.x-1.0-dev
 description = Module for Drupal to generate documentation about the Drupal setup
-
+package = Andy Truong
 core = 7.x
 
 dependencies[] = at_base
