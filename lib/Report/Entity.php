@@ -250,8 +250,40 @@ class Entity extends BaseReport
         }
 
         // 5. Sort all nodes this level.
-        usort($ordered_nodes, function($a, $b) {
-            return ($a['weight'] == $b['weight']) ? 0 : (($a['weight'] < $b['weight']) ? -1 : +1);
+        uasort($ordered_nodes, function($a, $b) {
+            // Becareful, uasort won't work if the weight is equal, see e.g.
+            // array (
+            //     0 => array(
+            //         'text' => 'A',
+            //         'weight' => -4
+            //     ),
+            //     1 => array(
+            //         'text' => 'B',
+            //         'weight' => -4
+            //     )
+            // )
+            // will return:
+            // array (
+            //     0 => array(
+            //         'text' => 'A',
+            //         'weight' => -4
+            //     ),
+            //     1 => array(
+            //         'text' => 'A',
+            //         'weight' => -4
+            //     )
+            // )
+            // if we return 0 in compare function.
+
+            /*if ($a['weight'] == $b['weight']) {
+                return 0;
+            }
+            else*/if ($a['weight'] < $b['weight']) {
+                return -1;
+            }
+            else {
+                return 1;
+            }
         });
 
         // 5. Finally return all nodes.
