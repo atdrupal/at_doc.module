@@ -57,6 +57,7 @@ class Modules extends BaseReport
 
         foreach ($packages as $package => $modules) {
             $count = count($modules);
+            $processed_package = $this->processPackage($modules);
 
             $build[] = array(
               '#theme' => 'fieldset',
@@ -64,7 +65,7 @@ class Modules extends BaseReport
               '#description' => theme('item_list', array('items' => array(
                 "Number of <strong>visible</strong>, <strong>enabled</strong> modules: {$count}",
               ))),
-              '#value' => render($this->processPackage($modules)),
+              '#value' => render($processed_package),
               '#collapsible' => TRUE,
               '#attributes' => array('class' => array('collapsible')),
             );
