@@ -22,6 +22,7 @@ class Entity extends BaseReport
                 $view_modes[] = $view_mode['label'];
             }
 
+            $processed_entity_type = $this->processEntityType($entity_type, $info);
             $build[] = array(
               '#theme' => 'fieldset',
               '#title' => $info['label'],
@@ -29,7 +30,7 @@ class Entity extends BaseReport
                 "<strong>Machine name:</strong> {$entity_type}",
                 "<strong>View modes</strong>: " . (!empty($view_modes) ? implode(', ', $view_modes) : '<em>No view mode</em>')
               ))),
-              '#value' => render($this->processEntityType($entity_type, $info)),
+              '#value' => render($processed_entity_type),
               '#collapsible' => TRUE,
               '#attributes' => array('class' => array('collapsible')),
             );
