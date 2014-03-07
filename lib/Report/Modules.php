@@ -162,7 +162,13 @@ class Modules extends BaseReport
             }
         }
 
-        return '<div class="admin-requirements">' . t('Requires: !module-list', array('!module-list' => implode(', ', $list))) . '</div>';
+        if (empty($list)) {
+            // Just return empty string, avoid 'Requires:' without information.
+            return '';
+        }
+        else {
+            return '<div class="admin-requirements">' . t('Requires: !module-list', array('!module-list' => implode(', ', $list))) . '</div>';
+        }
     }
 
     /**
@@ -193,7 +199,14 @@ class Modules extends BaseReport
             }
         }
 
-        return '<div class="admin-requirements">' . t('Required by: !module-list', array('!module-list' => implode(', ', $list))) . '</div>';
+
+        if (empty($list)) {
+            // Just return empty string, avoid 'Required by:' without information.
+            return '';
+        }
+        else {
+            return '<div class="admin-requirements">' . t('Required by: !module-list', array('!module-list' => implode(', ', $list))) . '</div>';
+        }
     }
 
     /**
