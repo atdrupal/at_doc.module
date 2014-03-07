@@ -171,8 +171,13 @@ class Entity extends BaseReport
         // Build rows for table.
         $rows = array();
         foreach ($odered_nodes as $node) {
+            $indentation = '';
+            for ($i = 0; $i < $node['level']; $i++) {
+                $indentation .= '<div class="indentation"> </div>';
+            }
+
             $rows[] = array(
-              $node['name'],
+              $indentation . $node['name'],
               $node['widget_type'],
               $node['description'],
             );
