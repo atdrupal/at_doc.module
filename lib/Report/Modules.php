@@ -5,6 +5,11 @@ namespace Drupal\at_doc\Report;
 class Modules extends BaseReport
 {
 
+    /**
+     * Report only visible and enabled modules.
+     *
+     * @return array Renderable array.
+     */
     protected function process()
     {
         $build = array();
@@ -39,6 +44,7 @@ class Modules extends BaseReport
         require_once DRUPAL_ROOT . '/includes/install.inc';
         $distribution_name = check_plain(drupal_install_profile_distribution_name());
 
+        // Build packages.
         $packages = array();
         foreach ($filtered_modules as $filename => $module) {
             $required = !empty($module->info['required']);
@@ -74,6 +80,13 @@ class Modules extends BaseReport
         return $build;
     }
 
+    /**
+     * Get module status if there are any errors.
+     *
+     * @param type $info
+     *   Module info.
+     * @return string
+     */
     private function getModuleStatusLong($info) {
 
         // Check the compatibilities.
@@ -183,6 +196,12 @@ class Modules extends BaseReport
         return '<div class="admin-requirements">' . t('Required by: !module-list', array('!module-list' => implode(', ', $list))) . '</div>';
     }
 
+    /**
+     * Show table for each package.
+     *
+     * @param type $modules
+     * @return array
+     */
     private function processPackage($modules)
     {
 
