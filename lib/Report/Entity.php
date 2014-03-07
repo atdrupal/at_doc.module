@@ -224,7 +224,7 @@ class Entity extends BaseReport
         }
 
         // 4. At rool level, add node that doesn't have parent.
-        if ($current_parent == '') {
+        if ($current_parent == '' && !empty($nodes)) {
             $ordered_nodes = array_merge($ordered_nodes, $nodes);
 
             usort($ordered_nodes, function($a, $b) {
