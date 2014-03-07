@@ -232,9 +232,6 @@ class Entity extends BaseReport
         // 4. Find all field nodes this level.
         if ($current_parent == '' && !empty($field_nodes)) {
             // Root level, get all field node left.
-            foreach ($field_nodes as &$node) {
-                $node['level'] = $level;
-            }
             $ordered_nodes = array_merge($group_nodes_this_level, $field_nodes);
         }
         else {
