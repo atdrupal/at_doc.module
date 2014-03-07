@@ -137,6 +137,7 @@ class Entity extends BaseReport
               'widget_type' => $field['widget']['type'],
               'description' => !empty($field['description']) ? $field['description'] : ($this->iconError() . '<em>Missing</em>'),
               'weight' => $field['widget']['weight'],
+              'level' => 0,
             );
             $nodes[$machine_name] = $node;
         }
@@ -152,6 +153,7 @@ class Entity extends BaseReport
               'widget_type' => $group->format_type,
               'description' => !empty($group->format_settings['instance_settings']['description']) ? $group->format_settings['instance_settings']['description'] : ($this->iconError() . '<em>Missing</em>'),
               'weight' => $group->weight,
+              'level' => 0,
             );
             $nodes[$machine_name] = $node;
 
@@ -191,7 +193,7 @@ class Entity extends BaseReport
         }
     }
 
-    private function buildOrderedNodes(&$nodes, $hierarchical_info, $current_parent = '')
+    private function buildOrderedNodes(&$nodes, $hierarchical_info, $current_parent = '', $level = 0)
     {
         $ordered_nodes = array();
         $added_keys = array();
@@ -200,6 +202,7 @@ class Entity extends BaseReport
         foreach ($nodes as $key => $node) {
 
             if ($hierarchical_info[$key]['parent'] == $current_parent) {
+                $node['level'] = $level;
                 $ordered_nodes[$key] = $node;
                 $added_keys[] = $key;
             }
@@ -219,12 +222,15 @@ class Entity extends BaseReport
         $children_nodes = array();
         foreach ($ordered_nodes as $key => $node) {
             if (!empty($nodes)) {
-                $children_nodes[$key] = $this->buildOrderedNodes($nodes, $hierarchical_info, $key);
+                $children_nodes[$key] = $this->buildOrderedNodes($nodes, $hierarchical_info, $key, $level + 1);
             }
         }
 
         // 4. At rool level, add node that doesn't have parent.
         if ($current_parent == '' && !empty($nodes)) {
+            foreach ($nodes as &$node) {
+                $node['level'] = $level;
+            }
             $ordered_nodes = array_merge($ordered_nodes, $nodes);
 
             usort($ordered_nodes, function($a, $b) {
