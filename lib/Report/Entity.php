@@ -224,9 +224,7 @@ class Entity extends BaseReport
         $children_nodes_this_level = array();
         foreach ($group_nodes_this_level as $key => $node) {
 
-            if (!empty($group_nodes)) {
-                $children_nodes_this_level[$key] = $this->buildOrderedNodes($field_nodes, $group_nodes, $hierarchical_info, $key, $level + 1);
-            }
+            $children_nodes_this_level[$key] = $this->buildOrderedNodes($field_nodes, $group_nodes, $hierarchical_info, $key, $level + 1);
         }
 
         $ordered_nodes = array();
