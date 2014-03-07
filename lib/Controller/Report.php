@@ -30,6 +30,7 @@ class Report {
     }
 
     public function renderReport($class) {
-        return render(at_id(new $class)->render());
+        $renderable_array = at_id(new $class)->render();
+        return render($renderable_array);
     }
 }
