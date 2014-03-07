@@ -124,7 +124,8 @@ class Entity extends BaseReport
     private function processBundleFieldsWithGroups($entity_type, $bundle)
     {
         // Each node contain enough information to be converted to row.
-        $nodes = array();
+        $field_nodes = array();
+        $group_nodes = array();
         $hierarchical_info = array();
 
         // Get all fields.
@@ -139,7 +140,7 @@ class Entity extends BaseReport
               'weight' => $field['widget']['weight'],
               'level' => 0,
             );
-            $nodes[$machine_name] = $node;
+            $field_nodes[$machine_name] = $node;
         }
         unset($fields, $field);
 
@@ -155,7 +156,7 @@ class Entity extends BaseReport
               'weight' => $group->weight,
               'level' => 0,
             );
-            $nodes[$machine_name] = $node;
+            $group_nodes[$machine_name] = $node;
 
             // Build hierarchical info.
             $hierarchical_info[$machine_name]['parent'] = !empty($group->parent_name) ? $group->parent_name : '';
@@ -164,8 +165,8 @@ class Entity extends BaseReport
         unset($groups, $group);
 
         // Build ordered nodes.
-        $odered_nodes = $this->buildOrderedNodes($nodes, $hierarchical_info);
-        unset($nodes, $hierarchical_info);
+        $odered_nodes = $this->buildOrderedNodes($field_nodes, $group_nodes, $hierarchical_info);
+        unset($field_nodes, $group_nodes, $hierarchical_info);
 
         // Build rows for table.
         $rows = array();
@@ -193,57 +194,72 @@ class Entity extends BaseReport
         }
     }
 
-    private function buildOrderedNodes(&$nodes, $hierarchical_info, $current_parent = '', $level = 0)
+    private function buildOrderedNodes(&$field_nodes, &$group_nodes, $hierarchical_info, $current_parent = '', $level = 0)
     {
-        $ordered_nodes = array();
-        $added_keys = array();
 
-        // 1. Find all nodes this level.
-        foreach ($nodes as $key => $node) {
+        // 1. Find all groups this level.
+        $group_nodes_this_level = array();
+        $added_keys = array();
+        foreach ($group_nodes as $key => $node) {
 
             if ($hierarchical_info[$key]['parent'] == $current_parent) {
                 $node['level'] = $level;
-                $ordered_nodes[$key] = $node;
+                $group_nodes_this_level[$key] = $node;
                 $added_keys[] = $key;
             }
 
         }
 
+        foreach ($added_keys as $key) {
+            unset($group_nodes[$key]);
+        }
+        unset($added_keys);
+
+        // 2. Find all children nodes of each group node in this level.
+        $children_nodes_this_level = array();
+        foreach ($group_nodes_this_level as $key => $node) {
+
+            if (!empty($group_nodes)) {
+                $children_nodes_this_level[$key] = $this->buildOrderedNodes($field_nodes, $group_nodes, $hierarchical_info, $key, $level + 1);
+            }
+        }
+
+        $ordered_nodes = array();
+
+        // 4. Find all field nodes this level.
+        if ($current_parent == '' && !empty($field_nodes)) {
+            // Root level, get all field node left.
+            foreach ($field_nodes as &$node) {
+                $node['level'] = $level;
+            }
+            $ordered_nodes = array_merge($group_nodes_this_level, $field_nodes);
+        }
+        else {
+            $ordered_nodes = $group_nodes_this_level;
+
+            if (!empty($field_nodes)) {
+                foreach ($hierarchical_info[$current_parent]['children'] as $child_node_key) {
+                    if (isset($field_nodes[$child_node_key])) {
+                        $node = $field_nodes[$child_node_key];
+                        $node['level'] = $level;
+                        $ordered_nodes[$child_node_key] = $node;
+                        unset($field_nodes[$child_node_key]);
+                    }
+                }
+            }
+        }
+
+        // 5. Sort all nodes this level.
         usort($ordered_nodes, function($a, $b) {
             return ($a['weight'] == $b['weight']) ? 0 : (($a['weight'] < $b['weight']) ? -1 : +1);
         });
 
-        // 2. Remove all nodes that is assigned to $ordered_nodes.
-        foreach ($added_keys as $key) {
-            unset($nodes[$key]);
-        }
-
-        // 3. Find all children nodes of each node in this level.
-        $children_nodes = array();
-        foreach ($ordered_nodes as $key => $node) {
-            if (!empty($nodes)) {
-                $children_nodes[$key] = $this->buildOrderedNodes($nodes, $hierarchical_info, $key, $level + 1);
-            }
-        }
-
-        // 4. At rool level, add node that doesn't have parent.
-        if ($current_parent == '' && !empty($nodes)) {
-            foreach ($nodes as &$node) {
-                $node['level'] = $level;
-            }
-            $ordered_nodes = array_merge($ordered_nodes, $nodes);
-
-            usort($ordered_nodes, function($a, $b) {
-                return ($a['weight'] == $b['weight']) ? 0 : (($a['weight'] < $b['weight']) ? -1 : +1);
-            });
-        }
-
-        // 5. Finally sort and return all rows.
+        // 5. Finally return all nodes.
         $results = array();
         foreach ($ordered_nodes as $key => $node) {
             array_push($results, $node);
-            if (isset($children_nodes[$key])) {
-                foreach ($children_nodes[$key] as $children_node) {
+            if (isset($children_nodes_this_level[$key])) {
+                foreach ($children_nodes_this_level[$key] as $children_node) {
                     array_push($results, $children_node);
                 }
             }
