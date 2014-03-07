@@ -32,6 +32,7 @@ class Modules extends BaseReport
           }
         }
 
+        module_load_include('inc', 'system', 'system.admin');
         uasort($filtered_modules, 'system_sort_modules_by_info_name');
 
         // Used when displaying modules that are required by the installation profile.
