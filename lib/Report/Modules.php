@@ -49,7 +49,7 @@ class Modules extends BaseReport
                 'version' => $module->info['version'],
                 'description' => t($module->info['description']) .
                   $this->getModuleStatusLong($module->info) .
-                  $this->getRequires($module->requires, $required, $explanation, $distribution_name, $all_modules) .
+                  $this->getRequires($module->requires, $required, $explanation, $distribution_name, $all_modules, $visible_modules) .
                   $this->getRequiredBy($module->required_by, $status, $all_modules, $visible_modules),
             );
         }
