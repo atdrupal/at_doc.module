@@ -47,3 +47,11 @@ routes:
     controller: ['Drupal\at_doc\Controller\Report', 'renderReport', ['Drupal\at_doc\Report\Views']]
     attached:
       css: ['@at_doc/misc/css/at_doc.css']
+
+  'admin/reports/documentation/modules':
+    title: Modules
+    access arguments: ['at-doc access']
+    type: constant('MENU_LOCAL_TASK')
+    controller: ['Drupal\at_doc\Controller\Report', 'renderReport', ['Drupal\at_doc\Report\Modules']]
+    attached:
+      css: ['@at_doc/misc/css/at_doc.css']
