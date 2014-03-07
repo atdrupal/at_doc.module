@@ -94,7 +94,7 @@ class Entity extends BaseReport
             $rows[] = array(
               "{$field_info['label']}" . (!empty($field_info['required']) ? '<span class="form-required">*</span>' : '') . " ({$field_name})",
               $field_info['widget']['type'],
-              !empty($field_info['description']) ? $field_info['description'] : ($this->iconError() . '<em>Missing</em>'),
+              !empty($field_info['description']) ? $field_info['description'] : ($this->iconError() . '<em> Missing</em>'),
             );
         }
 
@@ -136,7 +136,7 @@ class Entity extends BaseReport
               // Field's name doesn't have strong tag.
               'name' => "{$field['label']}" . (!empty($field['required']) ? '<span class="form-required">*</span>' : '') . " ({$machine_name})",
               'widget_type' => $field['widget']['type'],
-              'description' => !empty($field['description']) ? $field['description'] : ($this->iconError() . '<em>Missing</em>'),
+              'description' => !empty($field['description']) ? $field['description'] : ($this->iconError() . '<em> Missing</em>'),
               'weight' => $field['widget']['weight'],
               'level' => 0,
             );
@@ -152,7 +152,7 @@ class Entity extends BaseReport
               // Group's name have strong tag, field doesn't have that tag.
               'name' => "<strong>{$group->label}</strong> ({$machine_name})",
               'widget_type' => $group->format_type,
-              'description' => !empty($group->format_settings['instance_settings']['description']) ? $group->format_settings['instance_settings']['description'] : ($this->iconError() . '<em>Missing</em>'),
+              'description' => !empty($group->format_settings['instance_settings']['description']) ? $group->format_settings['instance_settings']['description'] : ($this->iconError() . '<em> Missing</em>'),
               'weight' => $group->weight,
               'level' => 0,
             );
