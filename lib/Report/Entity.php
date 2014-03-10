@@ -84,20 +84,8 @@ class Entity extends BaseReport
             $fields_processed = $this->processBundleFields($entity_type, $bundle);
         }
 
-        if (module_exists('eck') && isset($entity_info['module']) && $entity_info['module'] == 'eck') {
-            $admin_path = $bundle_info['admin']['path'];
-        }
-        else {
-            if (empty($bundle_info['admin']['real path'])) {
-                $admin_path = '';
-            }
-            else {
-                $admin_path = $bundle_info['admin']['real path'];
-            }
-        }
-
         return array(
-          (empty($admin_path) ? $bundle_info['label'] : l($bundle_info['label'], $admin_path))
+          $this->getAdminLink($entity_type, $bundle, $entity_info)
           . ' (' . $bundle . ')'
           . (
             empty($bundle_info['description'])

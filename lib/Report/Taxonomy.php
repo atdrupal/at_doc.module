@@ -78,7 +78,7 @@ class Taxonomy extends BaseReport
 
             foreach ($bundles as $bundle => $fields) {
 
-                $used_in[] = $entity_info['label'] . ' > ' . $entity_info['bundles'][$bundle]['label'];
+                $used_in[] = $entity_info['label'] . ' > ' . $this->getAdminLink($entity_type, $bundle, $entity_info, TRUE);
             }
         }
 
