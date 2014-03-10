@@ -82,7 +82,12 @@ class Taxonomy extends BaseReport
             }
         }
 
-        return theme('item_list', array('items' => $used_in));
+        if (!empty($used_in)) {
+            return theme('item_list', array('items' => $used_in));
+        }
+        else {
+            return '';
+        }
     }
 
     /**
