@@ -57,7 +57,7 @@ class Entity extends BaseReport
             foreach ($entity_info['bundles'] as $bundle => $bundle_info) {
                 $rows[] = array_merge(
                   array($this->findBundleFeature($entity_type, $entity_info, $bundle)),
-                  $this->processBundle($entity_type, $bundle, $bundle_info)
+                  $this->processBundle($entity_type, $entity_info, $bundle, $bundle_info)
                 );
             }
         }
@@ -74,7 +74,7 @@ class Entity extends BaseReport
         );
     }
 
-    private function processBundle($entity_type, $bundle, $bundle_info)
+    private function processBundle($entity_type, $entity_info, $bundle, $bundle_info)
     {
         // @todo - Need cache.
         if (module_exists('field_group')) {
@@ -84,8 +84,20 @@ class Entity extends BaseReport
             $fields_processed = $this->processBundleFields($entity_type, $bundle);
         }
 
+        if (module_exists('eck') && isset($entity_info['module']) && $entity_info['module'] == 'eck') {
+            $admin_path = $bundle_info['admin']['path'];
+        }
+        else {
+            if (empty($bundle_info['admin']['real path'])) {
+                $admin_path = '';
+            }
+            else {
+                $admin_path = $bundle_info['admin']['real path'];
+            }
+        }
+
         return array(
-          l($bundle_info['label'], $bundle_info['admin']['real path'])
+          (empty($admin_path) ? $bundle_info['label'] : l($bundle_info['label'], $admin_path))
           . ' (' . $bundle . ')'
           . (
             empty($bundle_info['description'])
