@@ -1,1 +1,5 @@
 table td { vertical-align: top !important; }
+
+.taxonomy-structure span {
+  display: block;
+}
