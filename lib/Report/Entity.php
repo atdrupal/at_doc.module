@@ -359,7 +359,7 @@ class Entity extends BaseReport
             }
         }
         else {
-            return $this->iconInfo() . ' <em>unknown</em>';
+            return $this->iconError() . ' <em>unknown</em>';
         }
     }
 
