@@ -5,8 +5,31 @@ namespace Drupal\at_doc\Report;
 class Taxonomy extends BaseReport
 {
 
+    private $field_map = array();
+
+    public function __construct() {
+
+        // Get map of all taxonomy term reference fields.
+        foreach (field_info_field_map() as $field_name => $bundles_info) {
+
+            if ($bundles_info['type'] == 'taxonomy_term_reference') {
+                $field_info = field_info_field($field_name);
+                if (empty($field_info['settings']['allowed_values'][0]['vocabulary'])) {
+                    continue;
+                }
+                $vocabulary = $field_info['settings']['allowed_values'][0]['vocabulary'];
+
+                foreach ($bundles_info['bundles'] as $entity_type => $bundles) {
+                    foreach ($bundles as $bundle) {
+                        $this->field_map[$vocabulary][$entity_type][$bundle][] = $field_name;
+                    }
+                }
+            }
+        }
+    }
+
     /**
-     * Report only visible and enabled modules.
+     * Report taxonomy structure and relationship.
      *
      * @return array Renderable array.
      */
@@ -21,27 +44,8 @@ class Taxonomy extends BaseReport
 
         $vocabularies = taxonomy_get_vocabularies();
 
-        // Get map of all taxonomy term reference fields.
-        $field_map = array();
-        foreach (field_info_field_map() as $field_name => $bundles_info) {
-
-            if ($bundles_info['type'] == 'taxonomy_term_reference') {
-                $field_info = field_info_field($field_name);
-                if (empty($field_info['settings']['allowed_values'][0]['vocabulary'])) {
-                    continue;
-                }
-                $vocabulary = $field_info['settings']['allowed_values'][0]['vocabulary'];
-
-                foreach ($bundles_info['bundles'] as $entity_type => $bundles) {
-                    foreach ($bundles as $bundle) {
-                        $field_map[$vocabulary][$entity_type][$bundle][] = $field_name;
-                    }
-                }
-            }
-        }
-
         foreach ($vocabularies as $vocabulary) {
-            $processed_vocabulary = $this->processEntityType($field_map, $vocabulary->machine_name);
+            $processed_vocabulary = $this->processVocabulary($vocabulary->machine_name);
 
             $build[] = array(
               '#theme' => 'fieldset',
@@ -58,6 +62,27 @@ class Taxonomy extends BaseReport
         }
 
         return $build;
+    }
+
+    /**
+     * Get place used this vocabulary.
+     *
+     * @param string $vocabulary_machine_name
+     * @return string
+     */
+    public function getUsedIn($vocabulary_machine_name) {
+        $used_in = array();
+
+        foreach ($this->field_map[$vocabulary_machine_name] as $entity_type => $bundles) {
+            $entity_info = entity_get_info($entity_type);
+
+            foreach ($bundles as $bundle => $fields) {
+
+                $used_in[] = $entity_info['label'] . ' > ' . $entity_info['bundles'][$bundle]['label'];
+            }
+        }
+
+        return theme('item_list', array('items' => $used_in));
     }
 
     /**
@@ -87,18 +112,18 @@ class Taxonomy extends BaseReport
      * Show all entity types and its taxonomy term reference fields.
      *
      * @param type $field_map
-     * @param type $vocabulary
+     * @param type $vocabulary_machine_name
      * @return array
      */
-    private function processEntityType($field_map, $vocabulary)
+    private function processVocabulary($vocabulary_machine_name)
     {
         $rows = array();
 
-        foreach ($field_map[$vocabulary] as $entity_type => $bundles) {
+        foreach ($this->field_map[$vocabulary_machine_name] as $entity_type => $bundles) {
             $entity_info = entity_get_info($entity_type);
             $name = $entity_info['label'] . ' (' . $entity_type . ')';
 
-            $bundle_processed = $this->processBundle($field_map, $vocabulary, $entity_type, $entity_info);
+            $bundle_processed = $this->processEntityType($vocabulary_machine_name, $entity_type, $entity_info);
             $rows[] = array(
               $name,
               drupal_render($bundle_processed)
@@ -119,18 +144,18 @@ class Taxonomy extends BaseReport
      * Show all bundles and its taxonomy term reference fields.
      *
      * @param type $field_map
-     * @param type $vocabulary
+     * @param type $vocabulary_machine_name
      * @param type $entity_type
      * @param type $entity_info
      * @return array
      */
-    private function processBundle($field_map, $vocabulary, $entity_type, $entity_info) {
+    private function processEntityType($vocabulary_machine_name, $entity_type, $entity_info) {
         $rows = array();
 
-        foreach ($field_map[$vocabulary][$entity_type] as $bundle => $fields) {
+        foreach ($this->field_map[$vocabulary_machine_name][$entity_type] as $bundle => $fields) {
             $name = $entity_info['bundles'][$bundle]['label'] . ' (' . $bundle . ')';
 
-            $fields_processed = $this->processFields($field_map, $vocabulary, $entity_type, $bundle);
+            $fields_processed = $this->processFields($vocabulary_machine_name, $entity_type, $bundle);
             $rows[] = array(
               $name,
               drupal_render($fields_processed)
@@ -151,15 +176,15 @@ class Taxonomy extends BaseReport
      * Show all taxonomy term reference fields.
      *
      * @param type $field_map
-     * @param type $vocabulary
+     * @param type $vocabulary_machine_name
      * @param type $entity_type
      * @param type $bundle
      * @return array
      */
-    private function processFields($field_map, $vocabulary, $entity_type, $bundle) {
+    private function processFields($vocabulary_machine_name, $entity_type, $bundle) {
         $rows = array();
 
-        foreach ($field_map[$vocabulary][$entity_type][$bundle] as $field_name) {
+        foreach ($this->field_map[$vocabulary_machine_name][$entity_type][$bundle] as $field_name) {
             $field_instance = field_info_instance($entity_type, $field_name, $bundle);
 
             $rows[] = array(

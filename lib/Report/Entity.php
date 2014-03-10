@@ -7,6 +7,12 @@ class Entity extends BaseReport
 
     public $name = 'Entity';
 
+    /**
+     *
+     * @var \Drupal\at_doc\Report\Taxonomy Taxonomy reporter.
+     */
+    private $taxonomy_reporter;
+
     protected function process()
     {
         $build = array();
@@ -42,6 +48,10 @@ class Entity extends BaseReport
     private function processEntityType($entity_type, $entity_info)
     {
         $rows = array();
+
+        if ($entity_type == 'taxonomy_term') {
+            $this->taxonomy_reporter = new Taxonomy();
+        }
 
         if (!empty($entity_info['bundles'])) {
             foreach ($entity_info['bundles'] as $bundle => $bundle_info) {
@@ -82,7 +92,10 @@ class Entity extends BaseReport
                 ? ''
                 : _filter_autop(strip_tags($bundle_info['description'])
             )
-          ),
+          )
+          . ($entity_type == 'taxonomy_term'
+            ? "<br><strong>Used in</strong>: " .$this->taxonomy_reporter->getUsedIn($bundle)
+            : ''),
           drupal_render($fields_processed),
           $this->iconInfo() . ' %permission'
         );
