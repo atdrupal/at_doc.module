@@ -61,6 +61,10 @@ class Modules extends BaseReport
             );
         }
 
+        // Sort packages.
+        // https://github.com/atdrupal/at_doc/issues/27
+        ksort($packages);
+
         foreach ($packages as $package => $modules) {
             $count = count($modules);
             $processed_package = $this->processPackage($modules);
