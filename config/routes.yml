@@ -55,11 +55,3 @@ routes:
     controller: ['Drupal\at_doc\Controller\Report', 'renderReport', ['Drupal\at_doc\Report\Modules']]
     attached:
       css: ['@at_doc/misc/css/at_doc.css']
-
-  'admin/reports/documentation/taxonomy':
-    title: Taxonomy
-    access arguments: ['at-doc access']
-    type: constant('MENU_LOCAL_TASK')
-    controller: ['Drupal\at_doc\Controller\Report', 'renderReport', ['Drupal\at_doc\Report\Taxonomy']]
-    attached:
-      css: ['@at_doc/misc/css/at_doc.css']
