@@ -32,14 +32,6 @@ routes:
     attached:
       css: ['@at_doc/misc/css/at_doc.css']
 
-  'admin/reports/documentation/node-types':
-    title: Node Types
-    access arguments: ['at-doc access']
-    type: constant('MENU_LOCAL_TASK')
-    controller: ['Drupal\at_doc\Controller\Report', 'renderReport', ['Drupal\at_doc\Report\NodeTypes']]
-    attached:
-      css: ['@at_doc/misc/css/at_doc.css']
-
   'admin/reports/documentation/views':
     title: Views
     access arguments: ['at-doc access']
