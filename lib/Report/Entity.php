@@ -13,6 +13,13 @@ class Entity extends BaseReport
      */
     private $taxonomy_reporter;
 
+    private $role_permissions;
+
+    public function __construct() {
+        $role_names = user_roles();
+        $this->role_permissions = user_role_permissions($role_names);
+    }
+
     protected function process()
     {
         $build = array();
@@ -84,20 +91,27 @@ class Entity extends BaseReport
             $fields_processed = $this->processBundleFields($entity_type, $bundle);
         }
 
+        $permission_processed = $this->processPermission($entity_type, $entity_info, $bundle);
+
+        if ($entity_type == 'node') {
+            $node_type = node_type_load($bundle);
+            $description = _filter_autop((empty($node_type->description)
+                ? $this->iconError() . '<em>Missing description</em>'
+                : strip_tags($node_type->description)));
+        }
+        else {
+            $description = _filter_autop($this->iconError() . '<em>Missing description</em>');
+        }
+
         return array(
           $this->getAdminLink($entity_type, $bundle, $entity_info)
           . ' (' . $bundle . ')'
-          . (
-            empty($bundle_info['description'])
-                ? ''
-                : _filter_autop(strip_tags($bundle_info['description'])
-            )
-          )
+          . $description
           . ($entity_type == 'taxonomy_term'
             ? "<br><strong>Used in</strong>: " .$this->taxonomy_reporter->getUsedIn($bundle)
             : ''),
           drupal_render($fields_processed),
-          $this->iconInfo() . ' %permission'
+          drupal_render($permission_processed),
         );
     }
 
@@ -358,22 +372,79 @@ class Entity extends BaseReport
         return $this->findFeature($map, $identifier);
     }
 
-    private function findFeature($features_map, $component) {
+    private function processPermission($entity_type, $entity_info, $bundle) {
+        $header[] = t('Role');
+        $rows = array();
 
-        if (isset($features_map[$component])) {
-            if (count($features_map[$component]) > 1) {
-                // Conflict.
-                return $this->iconError() . ' <em>conflict</em>' .
-                  theme('item_list', array('items' => $features_map[$component]));
+        foreach (user_roles() as $rid => $role_name) {
+            $rows[$role_name][$rid] = $role_name;
+
+            if ($entity_type == 'node') {
+                $actions = array('create', 'edit own', 'edit any', 'delete own', 'delete any');
+                $perm_template = "%action% %bundle% content";
+            }
+            elseif ($entity_type == 'comment') {
+                $actions = array('access', 'post', 'edit own');
+                $perm_template = "%action% comments";
+            }
+            elseif ($entity_type == 'taxonomy_term') {
+                $vocabulary = taxonomy_vocabulary_machine_name_load($bundle);
+                $actions = array('edit', 'delete');
+                $perm_template = "%action% terms in " . $vocabulary->vid;
+            }
+            elseif (module_exists('eck') && isset($entity_info['module']) && $entity_info['module'] == 'eck') {
+                $actions = array('add', 'edit', 'delete', 'list', 'view');
+                $perm_template = "eck %action% %entity_type% %bundle% entities";
+            }
+            elseif ($entity_type == 'user') {
+                $actions = array();
             }
             else {
-                $feature = reset($features_map[$component]);
-                return $feature;
+                return array(
+                  '#markup' => $this->iconInfo() . ' <em>'. t('No permission') .'</em>'
+                );
+            }
+
+            foreach ($actions as $action) {
+                $perm = $perm_template;
+                $perm = str_replace('%action%', $action, $perm);
+                $perm = str_replace('%entity_type%', $entity_type, $perm);
+                $perm = str_replace('%bundle%', $bundle, $perm);
+                $header[$perm] = ucwords($action);
+                $rows[$role_name][$perm] = isset($this->role_permissions[$rid][$perm]) ? $this->iconOk() : 'No';
+            }
+
+            // Special permissions.
+            switch ($entity_type) {
+                case 'comment':
+                    $perm = 'skip comment approval';
+                    $header[$perm] = ucwords('Skip Approval');
+                    $rows[$role_name][$perm] = isset($this->role_permissions[$rid][$perm]) ? $this->iconOk() : 'No';
+
+                    break;
+                case 'user':
+                    $perms = array(
+                      'access user profiles' => ucwords('Access Profiles'),
+                      'change own username' => ucwords('Change Own Username'),
+                      'cancel account' => ucwords('Cancel Own Account'),
+                    );
+                    foreach ($perms as $perm => $label) {
+                        $header[$perm] = $label;
+                        $rows[$role_name][$perm] = isset($this->role_permissions[$rid][$perm]) ? $this->iconOk() : 'No';
+                    }
+
+                    break;
+
+                default:
+                    break;
             }
         }
-        else {
-            return $this->iconError() . ' <em>unknown</em>';
-        }
+
+        return array(
+          '#theme' => 'table',
+          '#header' => $header,
+          '#rows' => $rows,
+        );
     }
 
 }

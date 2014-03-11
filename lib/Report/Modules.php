@@ -61,6 +61,10 @@ class Modules extends BaseReport
             );
         }
 
+        // Sort packages.
+        // https://github.com/atdrupal/at_doc/issues/27
+        ksort($packages);
+
         foreach ($packages as $package => $modules) {
             $count = count($modules);
             $processed_package = $this->processPackage($modules);
@@ -156,9 +160,11 @@ class Modules extends BaseReport
                 elseif ($all_modules[$requires]->status) {
                     $list[$requires] = t('@module (<span class="admin-enabled">enabled</span>)', array('@module' => $requires_name));
                 }
-                else {
-                    $list[$requires] = t('@module (<span class="admin-disabled">disabled</span>)', array('@module' => $requires_name));
-                }
+                // Don't print disabled modules.
+                // https://github.com/atdrupal/at_doc/issues/28
+//                else {
+//                    $list[$requires] = t('@module (<span class="admin-disabled">disabled</span>)', array('@module' => $requires_name));
+//                }
             }
         }
 
@@ -193,9 +199,11 @@ class Modules extends BaseReport
                 if ($all_modules[$required_by]->status == 1 && $status == 1) {
                     $list[] = t('@module (<span class="admin-enabled">enabled</span>)', array('@module' => $all_modules[$required_by]->info['name']));
                 }
-                else {
-                    $list[] = t('@module (<span class="admin-disabled">disabled</span>)', array('@module' => $all_modules[$required_by]->info['name']));
-                }
+                // Don't print disabled modules.
+                // https://github.com/atdrupal/at_doc/issues/28
+//                else {
+//                    $list[] = t('@module (<span class="admin-disabled">disabled</span>)', array('@module' => $all_modules[$required_by]->info['name']));
+//                }
             }
         }
 
