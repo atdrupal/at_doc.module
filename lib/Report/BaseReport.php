@@ -20,6 +20,32 @@ abstract class BaseReport {
     return $results;
   }
 
+  protected function getAdminLink($entity_type, $bundle, $entity_info = array(), $edit_fields = FALSE) {
+    if (empty($entity_info)) {
+      $entity_info = entity_get_info($entity_type);
+    }
+
+    $bundle_info = $entity_info['bundles'][$bundle];
+
+    if (module_exists('eck') && isset($entity_info['module']) && $entity_info['module'] == 'eck') {
+      $admin_path = $bundle_info['admin']['path'];
+    }
+    else {
+      if (empty($bundle_info['admin']['real path'])) {
+        $admin_path = '';
+      }
+      else {
+        $admin_path = $bundle_info['admin']['real path'];
+      }
+    }
+
+    if ($edit_fields) {
+      $admin_path .= '/fields';
+    }
+
+    return (empty($admin_path) ? $bundle_info['label'] : l($bundle_info['label'], $admin_path));
+  }
+
   protected function iconOk() {
     return '<img src="/misc/message-16-ok.png" />';
   }

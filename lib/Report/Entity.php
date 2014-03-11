@@ -104,7 +104,7 @@ class Entity extends BaseReport
         }
 
         return array(
-          l($bundle_info['label'], $bundle_info['admin']['real path'])
+          $this->getAdminLink($entity_type, $bundle, $entity_info)
           . ' (' . $bundle . ')'
           . $description
           . ($entity_type == 'taxonomy_term'
