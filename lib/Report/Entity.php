@@ -372,24 +372,6 @@ class Entity extends BaseReport
         return $this->findFeature($map, $identifier);
     }
 
-    private function findFeature($features_map, $component) {
-
-        if (isset($features_map[$component])) {
-            if (count($features_map[$component]) > 1) {
-                // Conflict.
-                return $this->iconError() . ' <em>conflict</em>' .
-                  theme('item_list', array('items' => $features_map[$component]));
-            }
-            else {
-                $feature = reset($features_map[$component]);
-                return $feature;
-            }
-        }
-        else {
-            return $this->iconError() . ' <em>unknown</em>';
-        }
-    }
-
     private function processPermission($entity_type, $entity_info, $bundle) {
         $header[] = t('Role');
         $rows = array();
