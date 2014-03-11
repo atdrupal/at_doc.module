@@ -26,6 +26,11 @@ class Report {
         ),
       );
 
+      // @todo - Report through drush.
+//      if ($this->is_cli) {
+//        
+//      }
+
       return render($return);
     }
 
