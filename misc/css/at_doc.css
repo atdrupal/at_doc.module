@@ -3,3 +3,15 @@ table td { vertical-align: top !important; }
 .taxonomy-structure span {
   display: block;
 }
+
+.permissions-list {
+  width: auto;
+}
+
+.permissions-list ul {
+  -webkit-column-count: 4; -moz-column-count: 4;
+}
+
+.permissions-list li {
+  white-space: nowrap;
+}
