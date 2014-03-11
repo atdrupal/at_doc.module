@@ -108,7 +108,7 @@ class Entity extends BaseReport
           . ' (' . $bundle . ')'
           . $description
           . ($entity_type == 'taxonomy_term'
-            ? "<br><strong>Used in</strong>: " .$this->taxonomy_reporter->getUsedIn($bundle)
+            ? $this->taxonomy_reporter->getUsedIn($bundle)
             : ''),
           drupal_render($fields_processed),
           drupal_render($permission_processed),

@@ -83,7 +83,7 @@ class Taxonomy extends BaseReport
         }
 
         if (!empty($used_in)) {
-            return theme('item_list', array('items' => $used_in));
+            return "<strong>Used in</strong>: " . theme('item_list', array('items' => $used_in));
         }
         else {
             return '';
