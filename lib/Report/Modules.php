@@ -158,7 +158,10 @@ class Modules extends BaseReport
                     ));
                 }
                 elseif ($all_modules[$requires]->status) {
-                    $list[$requires] = t('@module (<span class="admin-enabled">enabled</span>)', array('@module' => $requires_name));
+                    // Remove '(enabled)'
+                    // https://github.com/atdrupal/at_doc/issues/35
+//                    $list[$requires] = t('@module (<span class="admin-enabled">enabled</span>)', array('@module' => $requires_name));
+                    $list[$requires] = $requires_name;
                 }
                 // Don't print disabled modules.
                 // https://github.com/atdrupal/at_doc/issues/28
@@ -197,7 +200,10 @@ class Modules extends BaseReport
             // We show all (visible) modules required by, include enabled or disabled.
             if (isset($visible_modules[$required_by])) {
                 if ($all_modules[$required_by]->status == 1 && $status == 1) {
-                    $list[] = t('@module (<span class="admin-enabled">enabled</span>)', array('@module' => $all_modules[$required_by]->info['name']));
+                    // Remove '(enabled)'
+                    // https://github.com/atdrupal/at_doc/issues/35
+//                    $list[] = t('@module (<span class="admin-enabled">enabled</span>)', array('@module' => $all_modules[$required_by]->info['name']));
+                    $list[] = $all_modules[$required_by]->info['name'];
                 }
                 // Don't print disabled modules.
                 // https://github.com/atdrupal/at_doc/issues/28
