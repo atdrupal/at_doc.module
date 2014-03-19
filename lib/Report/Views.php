@@ -15,9 +15,9 @@ class Views extends BaseReport {
       $c2  = "<strong>{$view->human_name}</strong> ({$view->name})";
       $c2 .= _filter_autop($view->description);
       $c3  = $view->tag;
-      $c4 = '';
       $links    = array();
-      $empty_messages_rows = array();
+      $loop_index = 0;
+      $displays_count = count($view->display);
 
       foreach ($view->display as $display) {
         if ($display->display_plugin === 'page') {
@@ -33,48 +33,52 @@ class Views extends BaseReport {
           $empty_behaviours = array();
         }
 
-        if ($display->display_plugin !== 'default') {
-          // Overrided empty behaviours.
-          if (isset($display->display_options['empty'])) {
-            $empty_behaviours = $display->display_options['empty'];
-          }
+        // Overrided empty behaviours.
+        if (isset($display->display_options['empty'])) {
+          $empty_behaviours = $display->display_options['empty'];
+        }
 
-          // List readable empty messages.
-          $empty_messages = array();
-          foreach ($empty_behaviours as $key => $behaviour) {
-            if (in_array($behaviour['field'], array('area_text_custom', 'area')) && !empty($behaviour['content'])) {
-              $empty_messages[] = $behaviour['content'];
-            }
+        // List readable empty messages.
+        $empty_messages = array();
+        foreach ($empty_behaviours as $key => $behaviour) {
+          if (in_array($behaviour['field'], array('area_text_custom', 'area')) && !empty($behaviour['content'])) {
+            $empty_messages[] = $behaviour['content'];
           }
+        }
 
-          $empty_messages_rows[] = array(
-            $display->display_title,
-            theme('item_list', array('items' => $empty_messages))
+        $c4 = '<strong>' . $display->display_title . '</strong> (' . $display->id . ')';
+        $c5 = theme('item_list', array('items' => $empty_messages));
+        if ($loop_index == 0) {
+          $rows[] = array(
+            array(
+              'data' => $c1,
+              'rowspan' => $displays_count,
+            ),
+            array(
+              'data' => $c2 . (empty($links) ? '' : theme('item_list', array('items' => $links, 'title' => t('Paths')))),
+              'rowspan' => $displays_count,
+            ),
+            array(
+              'data' => $c3,
+              'rowspan' => $displays_count,
+            ),
+            $c4,
+            $c5
           );
         }
+        else {
+          $rows[] = array(
+            $c4,
+            $c5
+          );
+        }
+        $loop_index++;
       }
-
-      if (!empty($empty_messages_rows)) {
-        $empty_messages_table = array(
-          '#theme' => 'table',
-          '#header' => array('Display', 'Messages'),
-          '#rows' => $empty_messages_rows,
-          '#empty' => t('No Messages'),
-        );
-        $c4 = drupal_render($empty_messages_table);
-      }
-
-      $rows[] = array(
-        $c1,
-        $c2 . (empty($links) ? '' : theme('item_list', array('items' => $links, 'title' => t('Paths')))),
-        $c3,
-        $c4
-      );
     }
 
     return array(
       '#theme' => 'table',
-      '#header' => array('Feature', 'View', 'Tag', 'Empty Message'),
+      '#header' => array('Feature', 'View', 'Tag', 'Displays', 'Empty Messages'),
       '#rows' => $rows,
       '#empty' => t('No enabled views'),
     );
