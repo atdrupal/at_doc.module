@@ -10,7 +10,19 @@ class Views extends BaseReport {
   public function process() {
     $rows = array();
 
-    foreach (views_get_enabled_views() as $id => $view) {
+    $enabled_views = views_get_enabled_views();
+    // Sort by human name.
+    uasort($enabled_views, function($a, $b) {
+      if (strcmp($a->human_name, $b->human_name) < 0) {
+        return -1;
+      }
+      // Note: don't return 0.
+      // If two members compare as equal, their relative order in the sorted array is undefined.
+      // @see http://www.php.net/manual/en/function.uasort.php
+      return 1;
+    });
+
+    foreach ($enabled_views as $id => $view) {
       $c1  = isset($view->export_module) ? $view->export_module : $this->iconError() . ' unknown';
       $c2  = "<strong>{$view->human_name}</strong> ({$view->name})";
       $c2 .= _filter_autop($view->description);
