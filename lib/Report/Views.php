@@ -13,7 +13,9 @@ class Views extends BaseReport {
     $enabled_views = views_get_enabled_views();
     // Sort by human name.
     uasort($enabled_views, function($a, $b) {
-      if (strcmp($a->human_name, $b->human_name) < 0) {
+      $a_human_name = strtolower(trim($a->human_name));
+      $b_human_name = strtolower(trim($b->human_name));
+      if (strcmp($a_human_name, $b_human_name) < 0) {
         return -1;
       }
       // Note: don't return 0.
