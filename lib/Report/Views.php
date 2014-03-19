@@ -17,14 +17,12 @@ class Views extends BaseReport {
       $c3  = $view->tag;
       $c4 = '';
       $links    = array();
-      $displays = array();
       $empty_messages_rows = array();
 
       foreach ($view->display as $display) {
         if ($display->display_plugin === 'page') {
           $link = url($display->display_options['path']);
           $links[] = $link;
-          $displays[] = '<strong>'. $display->display_title .'</strong>' . ' ('. $display->display_plugin .')';
         }
 
         // Default empty behaviours on all displays.
@@ -70,14 +68,13 @@ class Views extends BaseReport {
         $c1,
         $c2 . (empty($links) ? '' : theme('item_list', array('items' => $links, 'title' => t('Paths')))),
         $c3,
-        !empty($displays) ? implode(', ', $displays) : '<em>No display</em>',
         $c4
       );
     }
 
     return array(
       '#theme' => 'table',
-      '#header' => array('Feature', 'View', 'Tag', 'Displays', 'Empty Message'),
+      '#header' => array('Feature', 'View', 'Tag', 'Empty Message'),
       '#rows' => $rows,
       '#empty' => t('No enabled views'),
     );
