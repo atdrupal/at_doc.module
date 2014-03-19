@@ -15,49 +15,70 @@ class Views extends BaseReport {
       $c2  = "<strong>{$view->human_name}</strong> ({$view->name})";
       $c2 .= _filter_autop($view->description);
       $c3  = $view->tag;
-      $c4 = '';
       $links    = array();
-      $displays = array();
+      $loop_index = 0;
+      $displays_count = count($view->display);
 
       foreach ($view->display as $display) {
-        // Only process display page.
         if ($display->display_plugin === 'page') {
           $link = url($display->display_options['path']);
           $links[] = $link;
-          $displays[] = '<strong>'. $display->display_title .'</strong>' . ' ('. $display->display_plugin .')';
-
-          // Empty behaviours.
-          if (isset($display->display_options['empty'])) {
-            // Overrided empty behaviours option.
-            $empty_behaviours = $display->display_options['empty'];
-          }
-          else {
-            $empty_behaviours = $view->display['default']->display_options['empty'];
-          }
-
-          // List readable empty messages.
-          $empty_messages = array();
-          foreach ($empty_behaviours as $key => $behaviour) {
-            if (in_array($behaviour['field'], array('area_text_custom', 'area')) && !empty($behaviour['content'])) {
-              $empty_messages[] = $behaviour['content'];
-            }
-          }
-          $c4 .= theme('item_list', array('items' => $empty_messages));
         }
-      }
 
-      $rows[] = array(
-        $c1,
-        $c2 . (empty($links) ? '' : theme('item_list', array('items' => $links, 'title' => t('Paths')))),
-        $c3,
-        !empty($displays) ? implode(', ', $displays) : '<em>No display</em>',
-        $c4
-      );
+        // Default empty behaviours on all displays.
+        if (isset($view->display['default']->display_options['empty'])) {
+          $empty_behaviours = $view->display['default']->display_options['empty'];
+        }
+        else {
+          $empty_behaviours = array();
+        }
+
+        // Overrided empty behaviours.
+        if (isset($display->display_options['empty'])) {
+          $empty_behaviours = $display->display_options['empty'];
+        }
+
+        // List readable empty messages.
+        $empty_messages = array();
+        foreach ($empty_behaviours as $key => $behaviour) {
+          if (in_array($behaviour['field'], array('area_text_custom', 'area')) && !empty($behaviour['content'])) {
+            $empty_messages[] = $behaviour['content'];
+          }
+        }
+
+        $c4 = '<strong>' . $display->display_title . '</strong> (' . $display->id . ')';
+        $c5 = theme('item_list', array('items' => $empty_messages));
+        if ($loop_index == 0) {
+          $rows[] = array(
+            array(
+              'data' => $c1,
+              'rowspan' => $displays_count,
+            ),
+            array(
+              'data' => $c2 . (empty($links) ? '' : theme('item_list', array('items' => $links, 'title' => t('Paths')))),
+              'rowspan' => $displays_count,
+            ),
+            array(
+              'data' => $c3,
+              'rowspan' => $displays_count,
+            ),
+            $c4,
+            $c5
+          );
+        }
+        else {
+          $rows[] = array(
+            $c4,
+            $c5
+          );
+        }
+        $loop_index++;
+      }
     }
 
     return array(
       '#theme' => 'table',
-      '#header' => array('Feature', 'View', 'Tag', 'Displays', 'Empty Message'),
+      '#header' => array('Feature', 'View', 'Tag', 'Displays', 'Empty Messages'),
       '#rows' => $rows,
       '#empty' => t('No enabled views'),
     );
