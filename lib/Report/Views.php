@@ -18,21 +18,27 @@ class Views extends BaseReport {
       $c4 = '';
       $links    = array();
       $displays = array();
+      $empty_messages_rows = array();
 
       foreach ($view->display as $display) {
-        // Only process display page.
         if ($display->display_plugin === 'page') {
           $link = url($display->display_options['path']);
           $links[] = $link;
           $displays[] = '<strong>'. $display->display_title .'</strong>' . ' ('. $display->display_plugin .')';
+        }
 
-          // Empty behaviours.
+        // Default empty behaviours on all displays.
+        if (isset($view->display['default']->display_options['empty'])) {
+          $empty_behaviours = $view->display['default']->display_options['empty'];
+        }
+        else {
+          $empty_behaviours = array();
+        }
+
+        if ($display->display_plugin !== 'default') {
+          // Overrided empty behaviours.
           if (isset($display->display_options['empty'])) {
-            // Overrided empty behaviours option.
             $empty_behaviours = $display->display_options['empty'];
-          }
-          else {
-            $empty_behaviours = $view->display['default']->display_options['empty'];
           }
 
           // List readable empty messages.
@@ -42,8 +48,22 @@ class Views extends BaseReport {
               $empty_messages[] = $behaviour['content'];
             }
           }
-          $c4 .= theme('item_list', array('items' => $empty_messages));
+
+          $empty_messages_rows[] = array(
+            $display->display_title,
+            theme('item_list', array('items' => $empty_messages))
+          );
         }
+      }
+
+      if (!empty($empty_messages_rows)) {
+        $empty_messages_table = array(
+          '#theme' => 'table',
+          '#header' => array('Display', 'Messages'),
+          '#rows' => $empty_messages_rows,
+          '#empty' => t('No Messages'),
+        );
+        $c4 = drupal_render($empty_messages_table);
       }
 
       $rows[] = array(
