@@ -58,7 +58,11 @@ class Views extends BaseReport {
           }
         }
 
-        $c4 = '<strong>' . $display->display_title . '</strong> (' . $display->id . ')';
+        $display_title = $display->display_title;
+        if (module_exists('views_ui')) {
+          $display_title = l($display_title, 'admin/structure/views/view/' . $view->name . '/edit/' . $display->id);
+        }
+        $c4 = '<strong>' . $display_title . '</strong> (' . $display->id . ')';
         $c5 = theme('item_list', array('items' => $empty_messages));
         if ($loop_index == 0) {
           $rows[] = array(
