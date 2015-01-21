@@ -1,16 +1,99 @@
 <?php
-/**
- * @file at_doc.module
- */
 
 /**
  * Implements hook_permission()
  */
 function at_doc_permission() {
   $items['at-doc access'] = array(
-    'title' => 'Acccess Website Documentation',
-    'description' => '',
+      'title'       => 'Acccess website documentation',
+      'description' => '',
   );
 
   return $items;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function at_doc_menu() {
+  $items = array();
+
+  $items['admin/reports/documentation'] = array(
+      'title'            => 'Site Documentation',
+      'description'      => 'Quick report for site setup',
+      'access arguments' => array('at-doc access'),
+      'page callback'    => 'at_doc_page_callback',
+      'page arguments'   => array('Drupal\at_doc\Controller\Report', 'renderReport', array('Drupal\at_doc\Report\Roles')),
+      'attached'         => array(
+          'css' => array('@at_doc/misc/css/at_doc.css')
+      )
+  );
+
+  $items['admin/reports/documentation/roles'] = array(
+      'title'            => 'Roles',
+      'access arguments' => array('at-doc access'),
+      'weight'           => -10,
+      'type'             => MENU_DEFAULT_LOCAL_TASK,
+      'page callback'    => 'at_doc_page_callback',
+      'page arguments'   => array('Drupal\at_doc\Controller\Report', 'renderReport', array('Drupal\at_doc\Report\Roles')),
+      'attached'         => array(
+          'css' => array('@at_doc/misc/css/at_doc.css')
+      )
+  );
+
+  $items['admin/reports/documentation/input-formats'] = array(
+      'title'            => 'Input Formats',
+      'access arguments' => array('at-doc access'),
+      'type'             => MENU_LOCAL_TASK,
+      'page callback'    => 'at_doc_page_callback',
+      'page arguments'   => array('Drupal\at_doc\Controller\Report', 'renderReport', array('Drupal\at_doc\Report\InputFormats')),
+      'attached'         => array(
+          'css' => array('@at_doc/misc/css/at_doc.css')
+      )
+  );
+
+  $items['admin/reports/documentation/entity'] = array(
+      'title'            => 'Entities',
+      'access arguments' => array('at-doc access'),
+      'type'             => MENU_LOCAL_TASK,
+      'page callback'    => 'at_doc_page_callback',
+      'page arguments'   => array('Drupal\at_doc\Controller\Report', 'renderReport', array('Drupal\at_doc\Report\Entity')),
+      'attached'         => array(
+          'css' => array('@at_doc/misc/css/at_doc.css')
+      )
+  );
+
+  $items['admin/reports/documentation/views'] = array(
+      'title'            => 'Views',
+      'access arguments' => array('at-doc access'),
+      'type'             => MENU_LOCAL_TASK,
+      'page callback'    => 'at_doc_page_callback',
+      'page arguments'   => array('Drupal\at_doc\Controller\Report', 'renderReport', array('Drupal\at_doc\Report\Views')),
+      'attached'         => array(
+          'css' => array('@at_doc/misc/css/at_doc.css')
+      )
+  );
+
+  $items['admin/reports/documentation/modules'] = array(
+      'title'            => 'Modules',
+      'access arguments' => array('at-doc access'),
+      'type'             => MENU_LOCAL_TASK,
+      'page callback'    => 'at_doc_page_callback',
+      'page arguments'   => array('Drupal\at_doc\Controller\Report', 'renderReport', array('Drupal\at_doc\Report\Modules')),
+      'attached'         => array(
+          'css' => array('@at_doc/misc/css/at_doc.css')
+      )
+  );
+
+  return $items;
+}
+
+/**
+ * Callback for report pages.
+ */
+function at_doc_page_callback($class, $method, $args) {
+  drupal_add_css(drupal_get_path('module', 'at_doc') . '/misc/css/at_doc.css');
+
+  $controller = new $class;
+  return call_user_func_array(array($controller, $method), $args);
 }
